@@ -54,3 +54,22 @@ def test_diagnostic_prompt_is_not_false_positive():
 def test_understanding_seeking_verbs_count_as_intent():
     r = score_prompt("explain why this deadlocks in worker.py")
     assert r.dimensions["states_intent"] is True
+
+
+def test_understanding_seeking_prompts_never_trigger():
+    # v2 regression (validation corpus FPs): a user asking to UNDERSTAND is
+    # doing the behavior the harness exists to encourage (DP1); flagging it
+    # is a construct error even when verification language is absent.
+    for p in (
+        "Explain why the session token expires early when the container timezone is UTC",
+        "Why does test_checkout fail only when run after test_inventory? I suspect shared fixture state",
+        "Walk me through how the middleware chain handles a 401 before I change the auth code",
+    ):
+        r = score_prompt(p)
+        assert r.dimensions["understanding_seeking"] is True
+        assert r.trigger is False, p
+
+
+def test_blind_delegation_still_triggers_after_exemption():
+    for p in ("just fix it", "make it production ready", "optimize it"):
+        assert score_prompt(p).trigger is True, p

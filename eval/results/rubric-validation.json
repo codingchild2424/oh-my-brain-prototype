@@ -1,27 +1,15 @@
 {
   "n": 40,
   "tp": 20,
-  "fp": 8,
-  "tn": 12,
+  "fp": 5,
+  "tn": 15,
   "fn": 0,
-  "precision": 0.714,
+  "precision": 0.8,
   "recall": 1.0,
   "errors": [
     [
       "FP",
       "Rename get_user to fetch_user in api/users.py and update the two call sites in views.py"
-    ],
-    [
-      "FP",
-      "Explain why the session token expires early when the container timezone is UTC"
-    ],
-    [
-      "FP",
-      "Why does test_checkout fail only when run after test_inventory? I suspect shared fixture state"
-    ],
-    [
-      "FP",
-      "Walk me through how the middleware chain handles a 401 before I change the auth code"
     ],
     [
       "FP",

@@ -1,10 +1,14 @@
 """R2: heuristic cognitive-debt rubric over a single user prompt.
 
-Dimensions (v1, refined from literature per spec OQ4):
+Dimensions (v3):
 - states_intent: does the prompt say WHY / what outcome is wanted?
 - states_constraints: does it mention files, APIs, conditions, or causes?
 - states_verification: does it say how the result will be checked?
 - specific_target: does it name a concrete artifact (path, function, error)?
+- understanding_seeking: is the prompt itself a comprehension request
+  ("explain", "why", "walk me through")? Such prompts NEVER trigger: the user
+  is already doing the behavior the harness protects (DP1), so intervening
+  would be pedagogically perverse (v2 false-positive analysis).
 - answer_seeking: is the user asking to be given an intervention answer outright?
 
 Debt score = weighted share of missing understanding signals. LLM-based
@@ -24,6 +28,8 @@ _CONSTRAINTS = re.compile(
 _VERIFICATION = re.compile(r"\b(test|verify|check|assert|pytest|expect|confirm|reproduce|minimal fix|show the)\b", re.I)
 _TARGET = re.compile(r"(\.\w{1,4}\b|/|\b[a-z_]+\([)]?|`[^`]+`|\b(?:function|class|module|endpoint|file|line \d+)\b)", re.I)
 _ANSWER_SEEKING = re.compile(r"\b(what'?s the answer|just tell me|give me the answer|정답|답 알려)\b", re.I)
+_UNDERSTANDING_SEEKING = re.compile(
+    r"^\s*(explain|why|how (?:does|do|is|are|did))\b|\b(walk me through|help me understand|i want to understand)\b", re.I)
 
 _WEIGHTS = {
     "states_intent": 0.25,
@@ -48,8 +54,11 @@ def score_prompt(prompt: str) -> RubricResult:
         "states_constraints": bool(_CONSTRAINTS.search(text)),
         "states_verification": bool(_VERIFICATION.search(text)),
         "specific_target": bool(_TARGET.search(text)),
+        "understanding_seeking": bool(_UNDERSTANDING_SEEKING.search(text)),
         "answer_seeking": bool(_ANSWER_SEEKING.search(text)),
     }
     score = sum(w for k, w in _WEIGHTS.items() if not dims[k])
     score = min(1.0, max(0.0, score))
-    return RubricResult(score=score, trigger=score > TRIGGER_THRESHOLD, dimensions=dims)
+    # DP1 exemption: comprehension requests never trigger an intervention
+    trigger = score > TRIGGER_THRESHOLD and not dims["understanding_seeking"]
+    return RubricResult(score=score, trigger=trigger, dimensions=dims)

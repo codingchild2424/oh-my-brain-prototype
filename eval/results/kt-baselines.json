@@ -1,0 +1,14 @@
+{
+  "round_held_out": {
+    "akt_auc": 0.708,
+    "per_kc_baseline_auc": 0.66
+  },
+  "persona_held_out": {
+    "held_out": [
+      "novice_hasty",
+      "advanced_rusty"
+    ],
+    "akt_auc": 0.805,
+    "per_kc_baseline_auc": 0.657
+  }
+}

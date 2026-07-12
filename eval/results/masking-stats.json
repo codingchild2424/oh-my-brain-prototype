@@ -12,9 +12,11 @@
     "returner_deliberate": 0.7
   },
   "mean_delta": 0.188,
-  "permutation_p": 0.2188,
+  "permutation_p": 0.1094,
   "bootstrap_95ci": [
-    -0.025,
-    0.413
-  ]
+    0.013,
+    0.2
+  ],
+  "masked_minus_control_mean": 0.1,
+  "sign_split_masked_vs_visible": "4 positive / 3 negative / 1 zero"
 }
