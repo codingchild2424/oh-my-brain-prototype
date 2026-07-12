@@ -40,3 +40,24 @@ def test_dashboard_shows_kc_accuracy_and_counts(tmp_path):
 def test_dashboard_handles_missing_data(tmp_path):
     out = build_dashboard(tmp_path)  # no logs at all
     assert "No data yet" in out.read_text(encoding="utf-8")
+
+
+def test_kc_names_shown_when_available(tmp_path):
+    # user feedback round 3: "KC 1" alone is meaningless; show the concept name
+    root = _seed(tmp_path)
+    (root / "kt" / "data" / "kc.json").write_text(
+        '{"kcs": {"concurrency": 1, "web-http": 2}, "questions": {}}')
+    html = build_dashboard(root).read_text(encoding="utf-8")
+    assert "concurrency" in html
+    assert "web-http" in html
+
+
+def test_interactive_learning_map_embedded(tmp_path):
+    # user feedback round 3: interactive learning map (self-contained SVG + JS)
+    root = _seed(tmp_path)
+    (root / "kt" / "data" / "kc.json").write_text(
+        '{"kcs": {"concurrency": 1, "web-http": 2}, "questions": {}}')
+    html = build_dashboard(root).read_text(encoding="utf-8")
+    assert "<svg" in html and "learning map" in html.lower()
+    assert "addEventListener" in html  # clickable nodes
+    assert "http://" not in html and "https://" not in html  # still self-contained

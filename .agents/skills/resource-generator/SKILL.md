@@ -5,7 +5,7 @@ description: Generate a learning artifact (markdown explainer, diagram image, in
 
 # Resource generator
 
-Generate ONE artifact into `learning/<kc>/`, then link it under `--- Learning check ---`.
+Generate ONE artifact, then link it under `--- Learning check ---`. Render every document/image/video material through the shared template so all materials look consistent: `from harness.material_page import build_material_page` (title, kc, body_html, optional image/video paths, optional self-check questions). It writes a styled, self-contained page under `learning/materials/`.
 
 Pick the medium by gap type:
 
