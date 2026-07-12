@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import time
 from pathlib import Path
 
@@ -42,13 +43,35 @@ def solar_llm(persona: dict, questions: list[dict]) -> list[int]:
         f"correctly (1) or incorrectly (0). Higher difficulty means lower chance for "
         f"low-skill learners. Reply ONLY with a JSON list of 0/1, one per question.\n{qtext}"
     )
-    resp = client.chat.completions.create(
-        model="solar-mini",
-        messages=[{"role": "user", "content": prompt}],
-        temperature=0.7,
-    )
-    out = json.loads(resp.choices[0].message.content.strip())
-    return [int(bool(v)) for v in out][: len(questions)]
+    last_err = None
+    for _ in range(3):  # retry: small models often wrap JSON in prose/fences
+        resp = client.chat.completions.create(
+            model="solar-mini",
+            messages=[{"role": "user", "content": prompt}],
+            temperature=0.7,
+        )
+        try:
+            out = _parse_binary_list(resp.choices[0].message.content, len(questions))
+            return out
+        except ValueError as e:
+            last_err = e
+    raise last_err
+
+
+def _parse_binary_list(text: str, n: int) -> list[int]:
+    """Extract n 0/1 values from a model reply (tolerates fences/prose/objects)."""
+    m = re.search(r"\[[^\[\]]*\]", text, re.S)
+    if m:
+        try:
+            vals = json.loads(m.group(0))
+            if isinstance(vals, list) and len(vals) >= n:
+                return [int(bool(v)) for v in vals[:n]]
+        except json.JSONDecodeError:
+            pass
+    bits = re.findall(r"[01]", re.sub(r"\d{2,}", "", text))
+    if len(bits) >= n:
+        return [int(b) for b in bits[:n]]
+    raise ValueError(f"could not extract {n} binary answers from: {text[:200]!r}")
 
 
 def generate_sequences(questions: list[dict], *, llm=solar_llm) -> dict[str, list[tuple[int, int]]]:

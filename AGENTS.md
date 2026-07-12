@@ -4,17 +4,19 @@ You are operating inside a repository equipped with **oh-my-brain**, a harness t
 
 ## First run (bootstrap)
 
-If `logs/` or `kt/state/` are missing, or hooks are not yet configured, run:
+If `logs/` or `kt/data/` are missing, run:
 
 ```bash
 bash scripts/bootstrap.sh
 ```
 
-This installs the prompt-logging hook, prepares log/state directories, and verifies the Python environment. It is idempotent; run it whenever unsure.
+This prepares state directories, self-tests the prompt hook, and checks the Python environment. It is idempotent; run it whenever unsure.
+
+How the pieces load (codex): the `UserPromptSubmit` hook in `.codex/hooks.json` runs automatically once this project is trusted; skills in `.agents/skills/` are auto-discovered; this file applies as-is. Nothing outside the repo is modified.
 
 ## Core loop (every user prompt)
 
-1. **Log**: the user's prompt is captured to `logs/prompts.jsonl` by the pre-prompt hook (do not disable it). If the hook is unavailable, append the record yourself using `python3 -m harness.cli log-prompt`.
+1. **Log**: the user's prompt is captured to `logs/prompts.jsonl` by the `UserPromptSubmit` hook (`.codex/hooks/on_user_prompt.py`), which also scores it and, when cognitive-debt signals appear, injects an intervention directive into your context (do not disable it). If the hook is unavailable (untrusted project), append the record yourself using `python3 -m harness.cli log-prompt` and assess with `python3 -m harness.cli assess`.
 2. **Do the work**: execute the user's request normally. Never delay, degrade, or hold the requested task hostage to any learning intervention.
 3. **Assess**: after (or while) doing the work, score the prompt with `python3 -m harness.cli assess` (cognitive-debt rubric). If it triggers, deliver ONE intervention in the same reply, clearly separated under a `--- Learning check ---` divider, after the task output.
 
