@@ -32,7 +32,9 @@ ONBOARDING = (
     "or just ask you to show it. "
     "(5) They can ask to learn anything anytime ('I'm curious about X'). "
     "Close by asking what they want to build. Keep the whole guide under 15 "
-    "lines; do not start any task before showing it."
+    "lines. This onboarding OVERRIDES every other rule for this turn, including "
+    "the goal-less questioning rule: show the guide FIRST, whatever the user's "
+    "message says, then close by asking what they want to build."
 )
 
 

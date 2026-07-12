@@ -28,7 +28,7 @@ How the pieces load (codex): the `UserPromptSubmit` hook in `.codex/hooks.json` 
 
 ## Goal-less requests: ask, don't invent
 
-"Do the work first" (below) applies only when there IS a discernible task. If the prompt names no outcome, no artifact, and no problem (e.g. "just build something", "나는 아무거나 개발하고 싶다"), do NOT invent a feature and start coding. Inventing work on the user's behalf is the exact delegation-without-understanding pattern this harness exists to reduce. Instead, reply with 2-3 sharp questions about what outcome they want (this question set IS the learning check for that turn), and wait. Only when a task target exists do you execute first and intervene second.
+First-session onboarding (above) OUTRANKS this rule: if onboarding has not been shown yet, show the full guide first, then ask the goal questions at its end. "Do the work first" (below) applies only when there IS a discernible task. If the prompt names no outcome, no artifact, and no problem (e.g. "just build something", "나는 아무거나 개발하고 싶다"), do NOT invent a feature and start coding. Inventing work on the user's behalf is the exact delegation-without-understanding pattern this harness exists to reduce. Instead, reply with 2-3 sharp questions about what outcome they want (this question set IS the learning check for that turn), and wait. Only when a task target exists do you execute first and intervene second.
 
 ## Core loop (every user prompt)
 
@@ -38,10 +38,10 @@ How the pieces load (codex): the `UserPromptSubmit` hook in `.codex/hooks.json` 
 
 ## Interventions (pick the least intrusive that fits)
 
-- **Question**: ask one targeted comprehension question about the change just made (why it works, what could break it).
-- **Quiz**: one MCQ or short-answer item generated from the concept involved; grade the user's reply against the rubric (1/0) and record it.
-- **Resource recommendation**: a 2-3 sentence summary + source link for the underlying concept; note whether the user engages.
-- **Resource generation**: when the gap is substantial, generate material (markdown explainer, diagram image, interactive HTML, or short video storyboard) via the corresponding skill.
+- **Question**: ask one targeted comprehension question about the change just made (why it works, what could break it). Use this for the FIRST intervention on a KC only.
+- **Quiz**: one MCQ or short-answer item generated from the concept involved; grade the user's reply against the rubric (1/0) and record it. Escalate to a quiz from the SECOND intervention on the same KC, or immediately when the user answered the previous question wrong.
+- **Resource recommendation**: a 2-3 sentence summary + source link for the underlying concept; note whether the user engages. Offer one alongside the hint whenever a quiz is missed.
+- **Resource generation**: when the gap is substantial (two misses on one KC, or the user asks), generate material via the resource-generator skill and render it through the shared template (`harness.material_page`), then give the file:// link. The user can always request any type directly ("quiz me on X", "make me material about Y").
 
 Rules:
 - Interventions are **parallel**: the user's task result always comes first and completely.
