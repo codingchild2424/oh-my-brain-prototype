@@ -22,7 +22,7 @@ How the pieces load (codex): the `UserPromptSubmit` hook in `.codex/hooks.json` 
 
 1. **Log**: the user's prompt is captured to `logs/prompts.jsonl` by the `UserPromptSubmit` hook (`.codex/hooks/on_user_prompt.py`), which also scores it and, when cognitive-debt signals appear, injects an intervention directive into your context (do not disable it). If the hook is unavailable (untrusted project), append the record yourself using `python3 -m harness.cli log-prompt` and assess with `python3 -m harness.cli assess`.
 2. **Do the work**: execute the user's request normally. Never delay, degrade, or hold the requested task hostage to any learning intervention.
-3. **Assess**: after (or while) doing the work, score the prompt with `python3 -m harness.cli assess` (cognitive-debt rubric). If it triggers, deliver ONE intervention in the same reply, clearly separated under a `--- Learning check ---` divider, after the task output.
+3. **Assess and gate**: deliver a learning check ONLY when one of these holds: (a) the hook injected an `[oh-my-brain]` directive for this prompt, or (b) the hook is unavailable AND your own `python3 -m harness.cli assess` run returns `"trigger": true`, or (c) the user initiated a learning request. Otherwise SKIP the learning check entirely: an informed, well-specified prompt has earned an uninterrupted reply, and unsolicited checks on such prompts are the number-one flow complaint from evaluations. When a check is warranted, deliver ONE intervention under the `--- Learning check ---` divider, after the task output.
 
 ## Interventions (pick the least intrusive that fits)
 
@@ -33,6 +33,10 @@ How the pieces load (codex): the `UserPromptSubmit` hook in `.codex/hooks.json` 
 
 Rules:
 - Interventions are **parallel**: the user's task result always comes first and completely.
+- **Legibility (human eval H1)**: the learning check must be instantly skimmable, never blended into task prose. Fixed format: the `--- Learning check ---` divider, then ONE bold headline line naming the concept (e.g. **Concept check: connection pooling**), then at most 4 short lines. No code blocks inside the check unless the check IS about reading code.
+- **User-initiated learning (human eval H3)**: when the user says they are curious about something or asks to learn/practice a topic, treat it as a welcomed learning request: answer Socratically, generate a quiz item for it, and record the outcome in the KT sequence like any intervention. Curiosity never triggers the debt rubric.
+- **Modality (human eval H4)**: when generating material, prefer including a visual (diagram image or Mermaid rendered to image if tooling exists) alongside text; personas and human users both asked for more than prose.
+- **Dashboard (human eval H2)**: after recording new outcomes, refresh the local dashboard with `python3 -m harness.dashboard` and mention the file path (learning/dashboard.html) once per session so the user knows it exists.
 - **Never reveal the answer** to an active question/quiz, even if asked directly. Give scaffolded hints instead (Socratic guidance). Record an answer-seeking attempt as an incorrect attempt only after 3 hint rounds are exhausted.
 - Grade every answered question/quiz 1 or 0 with `python3 -m harness.cli grade` (this assigns KC/Question numbers and appends to the KT sequence file).
 - At most one intervention per user prompt; skip entirely when the debt score is below threshold or the user is mid-incident (production outage, failing deadline language).
