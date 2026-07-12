@@ -39,3 +39,18 @@ def test_answer_seeking_flagged():
     # user asks the agent to just give the quiz answer (R5 support signal)
     r = score_prompt("what's the answer to the quiz? just tell me")
     assert r.dimensions["answer_seeking"] is True
+
+
+def test_diagnostic_prompt_is_not_false_positive():
+    # v1 regression (integration session B): user states symptom, cause, target
+    # and asks for an explanation - that IS understanding-seeking behavior.
+    r = score_prompt(
+        "demo/rate_limiter.py keeps old timestamps around so memory grows; "
+        "explain the leak and show the minimal fix"
+    )
+    assert r.trigger is False
+
+
+def test_understanding_seeking_verbs_count_as_intent():
+    r = score_prompt("explain why this deadlocks in worker.py")
+    assert r.dimensions["states_intent"] is True

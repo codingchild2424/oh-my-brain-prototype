@@ -15,9 +15,13 @@ from __future__ import annotations
 import re
 from dataclasses import dataclass
 
-_INTENT = re.compile(r"\b(because|so that|in order to|to (?:make|ensure|avoid|support)|goal|want|need)\b", re.I)
-_CONSTRAINTS = re.compile(r"\b(only|must|should|except|when|if|use|using|without|due to|caused by)\b", re.I)
-_VERIFICATION = re.compile(r"\b(test|verify|check|assert|pytest|expect|confirm|reproduce)\b", re.I)
+_INTENT = re.compile(
+    r"\b(because|so that|in order to|to (?:make|ensure|avoid|support)|goal|want|need"
+    r"|explain|why|understand|walk me through|how does)\b", re.I)  # understanding-seeking verbs ARE intent
+_CONSTRAINTS = re.compile(
+    r"\b(only|must|should|except|when|if|use|using|without|due to|caused by"
+    r"|so\b.*\b(grows|fails|leaks|breaks|crashes)|keeps?\b|leak|memory|bug is)\b", re.I)  # symptom/cause statements
+_VERIFICATION = re.compile(r"\b(test|verify|check|assert|pytest|expect|confirm|reproduce|minimal fix|show the)\b", re.I)
 _TARGET = re.compile(r"(\.\w{1,4}\b|/|\b[a-z_]+\([)]?|`[^`]+`|\b(?:function|class|module|endpoint|file|line \d+)\b)", re.I)
 _ANSWER_SEEKING = re.compile(r"\b(what'?s the answer|just tell me|give me the answer|정답|답 알려)\b", re.I)
 
