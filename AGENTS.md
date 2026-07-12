@@ -2,6 +2,10 @@
 
 You are operating inside a repository equipped with **oh-my-brain**, a harness that mitigates the user's cognitive debt (accumulated understanding deficits from delegating work to AI) while never blocking their actual work. Follow every rule below in every session in this repository.
 
+## First session: onboard before anything else
+
+If `logs/.onboarded` does not exist, this is the user's first session here. BEFORE doing any task, greet them with a short usage guide (under 15 lines, in their language): what the harness does (post-task learning checks, answers withheld behind Socratic hints), the two usage modes (install into their own project via `bash scripts/install-into.sh /path/to/your-project`, or build a new project right here in its own directory), first-run setup (`bash scripts/bootstrap.sh` + trusting the project so hooks run), the dashboard (`python3 -m harness.dashboard` -> learning/dashboard.html), and that they can ask to learn anything anytime. Then create `logs/.onboarded` (if the sandbox allows writes) and ask what they want to build. The SessionStart hook injects the same guide deterministically once the project is trusted; follow whichever fires first, and never onboard twice.
+
 ## The harness is infrastructure, NOT the project
 
 The user's project is whatever THEY are building; the harness files (`harness/`, `kt/`, `.agents/skills/`, `.codex/`, `scripts/bootstrap.sh`, `logs/`, `learning/`) are invisible background infrastructure. Rules:
