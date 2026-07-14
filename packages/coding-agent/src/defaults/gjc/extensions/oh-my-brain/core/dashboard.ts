@@ -117,13 +117,19 @@ document.querySelectorAll('circle.kc').forEach(c => c.addEventListener('click', 
 	);
 }
 
-function ktModelLine(paths: OmbPaths): string {
+function ktModelLine(paths: OmbPaths, hasMastery: boolean): string {
 	if (fs.existsSync(paths.aktCheckpoint)) {
 		const ts = new Date(fs.statSync(paths.aktCheckpoint).mtimeMs);
 		const stamp = `${ts.getFullYear()}-${String(ts.getMonth() + 1).padStart(2, "0")}-${String(ts.getDate()).padStart(2, "0")} ${String(ts.getHours()).padStart(2, "0")}:${String(ts.getMinutes()).padStart(2, "0")}`;
 		return (
 			"<br><small>KT model: AKT (attentive knowledge tracing; 2-layer transformer, d=64), " +
 			`local checkpoint trained ${stamp}.</small>`
+		);
+	}
+	if (hasMastery) {
+		return (
+			"<br><small>KT model: pretrained AKT weights (multi-KC, d=64) — a personal " +
+			"checkpoint trains automatically after ~20 outcomes.</small>"
 		);
 	}
 	return "<br><small>KT model: none trained yet; mastery falls back to recent accuracy. Trains automatically after ~20 outcomes.</small>";
@@ -160,7 +166,7 @@ export function buildDashboard(paths: OmbPaths, db: OmbDb, masteryVals: Record<s
 			`<span class='meter' style='width:220px'><i style='width:${pct}%'></i></span> ` +
 			`<b>${st.outstanding}</b> outstanding &middot; repaid ${st.repaid}/${st.accrued} (${pct}%)` +
 			"<br><small>accrued = prompts flagged as blind delegation; repaid = correct learning-check answers</small>" +
-			ktModelLine(paths) +
+			ktModelLine(paths, Object.keys(masteryVals).length > 0) +
 			"</div>",
 	);
 
