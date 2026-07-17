@@ -1,3 +1,9 @@
+> [!IMPORTANT]
+> **🚚 This repository has moved.** Development has migrated to
+> [**LEAP-LAB-KUS/oh-my-brain**](https://github.com/LEAP-LAB-KUS/oh-my-brain),
+> where all ongoing work now happens. This prototype repository is kept for
+> reference and is no longer updated.
+
 <p align="center">
   <img src="assets/oh-my-brain/logo.svg" alt="oh-my-brain logo" width="300" />
 </p>
